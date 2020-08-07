@@ -1,4 +1,4 @@
-package redisdao
+package xredis
 
 import (
 	"testing"

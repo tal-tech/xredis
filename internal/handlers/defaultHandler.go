@@ -34,7 +34,7 @@ func (this *DefaultHandler) getShardingKeyInConf(xesRedis redo.XesRedisBase, sha
 
 	machineNum, err := strconv.Atoi(confutil.GetConf("", shardingNumInConf))
 	if err != nil || machineNum == 0 {
-		logger.Ex(xesRedis.GetCtx(), "Redis", "GetInstance "+shardingNumInConf+" err %v(or value is 0)", err)
+		logger.Ex(xesRedis.GetCtx(), "xredis", "GetInstance "+shardingNumInConf+" err %v(or value is 0)", err)
 		machineNum = 0
 	}
 
