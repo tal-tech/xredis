@@ -7,7 +7,7 @@
 *   Description：
 *
 ================================================================*/
-package redisdao
+package xredis
 
 import (
 	"context"

@@ -80,28 +80,28 @@ func initRedis() {
 			if rt, err := strconv.Atoi(p); err == nil {
 				options.PoolSize = rt
 			} else {
-				logger.E("Redis Error", "poolsize strconv.Atoi(%+v) error:%v", p, err)
+				logger.E("xredis Error", "poolsize strconv.Atoi(%+v) error:%v", p, err)
 			}
 		}
 		if p := confutil.GetConf("RedisConfig", k+".db"); p != "" {
 			if rt, err := strconv.Atoi(p); err == nil {
 				options.DB = rt
 			} else {
-				logger.E("Redis Error", ".db strconv.Atoi(%+v) error:%v", p, err)
+				logger.E("xredis Error", ".db strconv.Atoi(%+v) error:%v", p, err)
 			}
 		}
 		if p := confutil.GetConf("RedisConfig", k+".idletimeout"); p != "" {
 			if rt, err := strconv.Atoi(p); err == nil {
 				options.IdleTimeout = time.Second * time.Duration(rt)
 			} else {
-				logger.E("Redis Error", ".idletimeout strconv.Atoi(%+v) error:%v", p, err)
+				logger.E("xredis Error", ".idletimeout strconv.Atoi(%+v) error:%v", p, err)
 			}
 		}
 		if p := confutil.GetConf("RedisConfig", k+".readtimeout"); p != "" {
 			if rt, err := strconv.Atoi(p); err == nil {
 				options.ReadTimeout = time.Second * time.Duration(rt)
 			} else {
-				logger.E("Redis Error", ".readtimeout strconv.Atoi(%+v) error:%v", p, err)
+				logger.E("xredis Error", ".readtimeout strconv.Atoi(%+v) error:%v", p, err)
 			}
 		}
 		if p := confutil.GetConf("RedisConfig", k+".password"); p != "" {
@@ -111,7 +111,7 @@ func initRedis() {
 			if rt, err := strconv.Atoi(p); err == nil {
 				options.MaxRetries = rt
 			} else {
-				logger.E("Redis Error", ".maxretries strconv.Atoi(%+v) error:%v", p, err)
+				logger.E("xredis Error", ".maxretries strconv.Atoi(%+v) error:%v", p, err)
 			}
 		}
 		selectorIns := new(Selector)

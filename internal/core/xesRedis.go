@@ -156,7 +156,7 @@ func (this *XesRedis) goRoutine() {
 		res := this.exec()
 		if res.err != nil {
 			//this.String() called inside this.exec().
-			logger.Ex(this.ctx, this.loggerTag, this.keyName+" "+this.cmd+" RedisErr: %v", res.err)
+			logger.Ex(this.ctx, this.loggerTag, this.keyName+" "+this.cmd+" xredisErr: %v", res.err)
 		}
 	})
 	if !result {
@@ -198,7 +198,7 @@ func (this *XesRedis) slowLog(start time.Time) {
 	}
 	cost := time.Now().Sub(start)
 	if cost > threshold {
-		logger.Ix(this.ctx, "XesRedis slowLog", "redis instance %s, cmd %v, key %v, args %v, cost %v", this.instance, this.cmd, this.key, this.args, cost)
+		logger.Ix(this.ctx, "xredis slowLog", "redis instance %s, cmd %v, key %v, args %v, cost %v", this.instance, this.cmd, this.key, this.args, cost)
 	}
 	return
 }
@@ -217,7 +217,7 @@ func (this *XesRedis) warnSize(v interface{}) {
 		size = len(fmt.Sprint(vv))
 	}
 	if size > maxSize {
-		logger.Ix(this.ctx, "XesRedis warnSize", "redis instance %s, cmd %v, key %v, args %v, val szie %d", this.instance, this.cmd, this.key, this.args, size)
+		logger.Ix(this.ctx, "xredis warnSize", "redis instance %s, cmd %v, key %v, args %v, val szie %d", this.instance, this.cmd, this.key, this.args, size)
 	}
 	return
 }
@@ -246,7 +246,7 @@ func (this *XesRedis) exec() RedisResult {
 		newcmd = append(newcmd, v)
 	}
 
-	logger.Dx(this.ctx, "XesRedis exec()", "redis instance %s, redis cmd %v", this.instance, newcmd)
+	logger.Dx(this.ctx, "xredis exec()", "redis instance %s, redis cmd %v", this.instance, newcmd)
 
 	cmd := redis.NewCmd(newcmd...)
 	if this.goPipeLine {
@@ -255,7 +255,7 @@ func (this *XesRedis) exec() RedisResult {
 
 	client := GetClient(this.instance)
 	if client == nil {
-		logger.Wx(this.ctx, "Redisdao.exec.ClientNil", "GetClient is nil, Instance : %v", this.instance)
+		logger.Wx(this.ctx, "xredis.exec.ClientNil", "GetClient is nil, Instance : %v", this.instance)
 		return RedisResult{err: logger.NewError("[exec] GetClient is nil")}
 	}
 
@@ -265,9 +265,9 @@ func (this *XesRedis) exec() RedisResult {
 	res.err = err
 	if err != nil {
 		if err == redis.Nil {
-			logger.Dx(this.ctx, "Redisdao.exec.RedisNil", "redis cmd %v, err msg %v", newcmd, err)
+			logger.Dx(this.ctx, "xredis.exec.RedisNil", "redis cmd %v, err msg %v", newcmd, err)
 		} else {
-			logger.Ex(this.ctx, "Redisdao.exec.RedisError", "redis cmd %+v, err %v, info: %+v", newcmd, err, this.String())
+			logger.Ex(this.ctx, "xredis.exec.RedisError", "redis cmd %+v, err %v, info: %+v", newcmd, err, this.String())
 		}
 	}
 	this.warnSize(res.value)
@@ -285,7 +285,7 @@ func (this *XesRedis) OpenPipeLine() {
 	for k, _ := range GetSelectors() {
 		client := GetClient(k)
 		if client == nil {
-			logger.Ex(this.ctx, "Redisdao.OpenPipeLine", "GetClient fail:%v", k)
+			logger.Ex(this.ctx, "xredis.OpenPipeLine", "GetClient fail:%v", k)
 			continue
 		}
 		pip := &PipelineIns{client.Pipeline(), false}
@@ -314,7 +314,7 @@ func (this *XesRedis) ExecPipeLine() (ret []RedisResult, errs []error) {
 			defer wg.Done()
 			cmder, err := pip.pipeliner.Exec()
 			if err != nil && err != redis.Nil {
-				logger.Ex(this.ctx, "Redisdao.ExecPipeLine", "Pipeline execute error %v", err)
+				logger.Ex(this.ctx, "xredis.ExecPipeLine", "Pipeline execute error %v", err)
 				lo.Lock()
 				errs = append(errs, err)
 				lo.Unlock()
@@ -324,13 +324,13 @@ func (this *XesRedis) ExecPipeLine() (ret []RedisResult, errs []error) {
 				var result RedisResult
 				result.err = cmd.Err()
 				if result.err != nil && result.err != redis.Nil {
-					logger.Ex(this.ctx, "Redisdao.ExecPipeLine", "Pipeline execute %v command args %v, err %v", cmd.Name(), cast.ToStringSlice(cmd.Args()), cmd.Err())
+					logger.Ex(this.ctx, "xredis.ExecPipeLine", "Pipeline execute %v command args %v, err %v", cmd.Name(), cast.ToStringSlice(cmd.Args()), cmd.Err())
 				} else {
 					tmpcmd, ok := cmd.(*redis.Cmd)
 					if ok {
 						result.value, _ = tmpcmd.Result()
 					} else {
-						result.err = logger.NewError("Redisdao.ExecPipeLine assert cmd fail")
+						result.err = logger.NewError("xredis.ExecPipeLine assert cmd fail")
 					}
 				}
 				lo.Lock()
@@ -385,7 +385,7 @@ func (this *XesRedis) String() (back string) {
 	if err != nil {
 		return str
 	}
-	logger.Ex(this.ctx, "XesRedis", "String str %v", str)
+	logger.Ex(this.ctx, "xredis", "String str %v", str)
 	if GetEnableKafka() {
 		this.sendKafka("xes_redis_err", []byte(str))
 	}
